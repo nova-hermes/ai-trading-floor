@@ -1,0 +1,30 @@
+# AI Trading Floor v2 — Dependencies
+# Core
+openbb==4.4.5          # OpenBB Platform (Bloomberg alternative)
+ccxt==4.4.55           # Unified crypto exchange API (20+ exchanges)
+pandas>=2.0.0
+numpy>=1.24.0
+python-dotenv>=1.0.0
+
+# LLM & Agents
+openai>=1.0.0          # For OpenRouter/Xiaomi API calls
+pydantic>=2.0.0        # Data validation
+
+# Data & Analysis
+yfinance>=0.2.0        # Quick stock data (backup)
+pandas-ta>=0.3.14b     # Technical indicators
+plotly>=5.18.0         # Charts
+kaleido>=0.2.1         # Chart export
+
+# Backtesting
+backtrader>=1.9.78     # Backtesting engine
+vectorbt>=0.26.0       # Vectorized backtesting (optional, needs numpy<2)
+
+# Database
+sqlite3                # Built-in, for trade history
+
+# Utilities
+rich>=13.0.0           # Terminal UI
+click>=8.0.0           # CLI
+pyyaml>=6.0            # Config files
+requests>=2.31.0       # HTTP
