@@ -562,17 +562,41 @@ def api_execute():
         from execution.engine import execution_engine
         from agents.trading_floor import TradeDecision
 
+        symbol = data['symbol']
+        action = data['action']
+
+        # Pre-checks with specific error messages
+        if action == 'HOLD':
+            return jsonify({'error': 'Cannot execute HOLD signal — no trade to make'})
+
+        # Check risk limits
+        open_positions = execution_engine._get_open_positions()
+        for pos in open_positions:
+            if pos.symbol == symbol:
+                return jsonify({'error': f'Already have an open position in {symbol}. Close it first.'})
+
+        if len(open_positions) >= 5:
+            return jsonify({'error': f'Max 5 open positions reached. Close some positions first.'})
+
         decision = TradeDecision(
-            symbol=data['symbol'], action=data['action'], confidence=0.7,
+            symbol=symbol, action=action, confidence=0.7,
             entry_price=data['entry_price'],
             stop_loss=data.get('stop_loss', 0), take_profit=data.get('take_profit', 0),
             position_size_pct=0.05, reasoning='Manual execution from dashboard',
         )
+
+        # Get price first to verify
+        current_price = execution_engine._get_current_price(symbol)
+        if not current_price:
+            return jsonify({'error': f'Could not get current price for {symbol}. Check symbol format.'})
+
         position = execution_engine.execute_decision(decision)
         if position:
             return jsonify({'success': True, 'position_id': position.id})
-        return jsonify({'error': 'Trade not executed (HOLD or risk limit)'})
+        return jsonify({'error': 'Trade execution failed — check console for details'})
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)})
 
 
